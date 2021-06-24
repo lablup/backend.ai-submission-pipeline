@@ -1,7 +1,13 @@
 """
 (C) 2015-2021 Lablup Inc.
 
-This script compress the code directory and send to test server.
+Backend.AI Code Submitter Example
+=================================
+
+Collect and compress the "code" directory in the current working dorectry
+and send the compressed submission to a evaluation server.
+
+The evaluation server sample is the ``evaluator`` module.
 
 NOTE: this code is super-simplified version of CodeOnWeb auto-grade feature,
       but modified to run without ingen server.
@@ -71,3 +77,7 @@ def main():
             print(response.text)
         else:
             print("Cannot send the file to server. Please check your connection / server status.")
+
+
+if __name__ == "__main__":
+    main()

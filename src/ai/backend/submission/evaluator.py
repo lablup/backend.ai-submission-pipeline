@@ -1,8 +1,11 @@
 """
 (C) 2015-2021 Lablup Inc.
 
-This script receives codes.
-It also stores them and run on the cloud.
+Backend.AI Code Evaluator Example
+=================================
+
+Accept code submissions, stores them into the "store" directory in the current working directory,
+and run the submission on the Backend.AI cloud.
 
 NOTE: This code is super-simplified version of CodeOnWeb auto-grade feature,
       but modified to run without ingen server.
@@ -82,4 +85,8 @@ async def get_run_cmd(
 
 
 def main():
-    uvicorn.run(f"{__name__}:app", log_level="info")
+    uvicorn.run(app, log_level="info")
+
+
+if __name__ == "__main__":
+    main()
