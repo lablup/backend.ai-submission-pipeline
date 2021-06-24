@@ -73,10 +73,13 @@ async def get_run_cmd(
         "-r", "cuda.shares=4",
         # The project name you belongs to.
         "-g", "lablup",
-        # The execution command to evalute the submission.
+        # The install command to install dependencies of the submission.
         # The uploaded path inside container follows the relative path to the current working
         # directory of the client and this submission script.
-        "--exec", f"unzip {submitted_file_path} -d .; cd code; python test.py",
+        "--build",
+        f"unzip {submitted_file_path} -d .; pip install --user -r ./code/requirements_test.txt",
+        # The execution command to evalute the submission.
+        "--exec", "cd code; python test.py",
         # The image name
         "cr.backend.ai/cloud/python:3.8-ubuntu18.04",
         # The uploaded file(s)
