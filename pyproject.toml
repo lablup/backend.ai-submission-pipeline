@@ -11,6 +11,7 @@ fastapi = "^0.65.2"
 uvicorn = "^0.14.0"
 python-multipart = "^0.0.5"
 aiofiles = "^0.7.0"
+"backend.ai-client" = "^21.3.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
