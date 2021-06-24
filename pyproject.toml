@@ -17,7 +17,7 @@ aiofiles = "^0.7.0"
 pytest = "^5.2"
 
 [tool.poetry.scripts]
-receive = "cd receive;uvicorn --reload receiver_demo:app"
+receive = "receiver_demo:main"
 submit = "submit.main:main"
 
 [build-system]

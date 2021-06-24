@@ -6,30 +6,32 @@ Basically, this example is the simplest and most lightweight version of the inge
 You can create your own pipeline by adding or modifying your own implementations in the various parts.
 
 
-## Setup build environment
+## Setup
 
-We use [poetry](https://github.com/python-poetry/poetry) to manage dependencies and packaging. Poetry can be installed by the following command.
+We use [poetry](https://github.com/python-poetry/poetry) to manage dependencies and packaging.
+Poetry can be installed by the following command.
 
 ```shell
 curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
 source ~/.poetry/env  # == export PATH="$HOME/.poetry/bin:$PATH"
 ```
 
-We also recommend to use virtualenv to separate dependencies. After activating the virtualenv, run following command to install dependencies.
+Once poetry is installed, run the following to automatically populate a dedicated virtual
+environment and all dependency packages:
 
 ```shell
 poetry install
 ```
 
 
-## Run the receive server
+## Run the submission receiver sample
 
 ```shell
 poetry run uvicorn --app-dir receiver receiver_demo:app
 ```
 
 
-## Run the sender
+## Run the submission sender sample
 
 ```shell
 poetry run submit
