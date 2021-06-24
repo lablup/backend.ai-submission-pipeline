@@ -184,6 +184,7 @@ async def exec_loop(
 
 
 def check_result(stdout: str):
+    # FIXME: put your own evaluation logic
     assert "Hello Backend.AI!" in stdout
 
 

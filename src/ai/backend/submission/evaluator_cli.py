@@ -126,6 +126,7 @@ def get_log_cmd(session_name: str):
 
 
 def check_result(stdout: str):
+    # FIXME: put your own evaluation logic
     assert "Hello Backend.AI!" in stdout
 
 
