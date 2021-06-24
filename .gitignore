@@ -129,5 +129,5 @@ dmypy.json
 .pyre/
 
 # runtime directories and files
-store/
+store/*.zip
 submission.zip
