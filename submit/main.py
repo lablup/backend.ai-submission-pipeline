@@ -48,7 +48,7 @@ def main():
         )
         for line in installed_packages_list:
             installed_package_list_file.write(line + "\n")
-        installed_package_list_file.seek(0)
+
     print("Compressing user codes to submit...")
     with zipfile.ZipFile('submission.zip', mode='w') as zf:
         for f in list_submission_files("./code"):

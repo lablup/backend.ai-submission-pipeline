@@ -8,9 +8,10 @@ NOTE: This code is super-simplified version of CodeOnWeb auto-grade feature,
       but modified to run without ingen server.
 """
 
-from asyncio import create_subprocess_exec
+import asyncio
 from datetime import datetime
 import logging
+import os
 from pathlib import Path
 from typing import Optional, Union
 
@@ -19,6 +20,12 @@ from fastapi import FastAPI, File, UploadFile, Header
 
 app = FastAPI()
 log = logging.getLogger(__name__)
+
+
+if 'BACKEND_ACCESS_KEY' not in os.environ:
+    raise RuntimeError("Specify BACKEND_ACCESS_KEY environment variable for the evaluator account.")
+if 'BACKEND_SECRET_KEY' not in os.environ:
+    raise RuntimeError("Specify BACKEND_SECRET_KEY environment variable for the evaluator account.")
 
 
 @app.post("/submit/")
@@ -35,12 +42,12 @@ async def create_upload_file(
 
     # Save and store the file in specific directory.
     async with aiofiles.open(submitted_file_path, 'wb') as out_file:
-        while content := await file.read(1024):  # async read chunk
-            await out_file.write(content)  # async write chunk
+        while content := await file.read(1024):
+            await out_file.write(content)
 
     # Add your backend.ai CLI command here. This is an example.
     cmdargs = await get_run_cmd(submitted_file_path)
-    background_process = await create_subprocess_exec(*cmdargs)
+    background_process = await asyncio.create_subprocess_exec(*cmdargs)
     await background_process.wait()
 
     return {"filename": file.filename}
