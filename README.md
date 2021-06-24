@@ -10,6 +10,9 @@ the readers could just copy-and-paste the desired part of the sample code.
 Basically, this example is the simplest and most lightweight version of the ingen project (CodeOnWeb engine). 
 You can create your own pipeline by adding or modifying your own implementations in the various parts.
 
+To utilize this sample codes, you must adapt the CLI arguments and SDK function arguments in the codes
+to fit with your setup (account keypairs, API endpoint, etc.).
+
 
 ## Setup
 
@@ -47,7 +50,7 @@ $ python src/ai/backend/submission/evaluator_cli.py
 
 ## Run the submission evaluator (based on SDK) sample
 
-This evaluator invkes the client SDK's functional API directly to execute user codes and get the
+This evaluator invokes the client SDK's functional API directly to execute user codes and get the
 result logs.  It is more efficient because it does not have to download the stdout/stderr logs
 twice and the stdout includes only the direct result of the given user code.
 
