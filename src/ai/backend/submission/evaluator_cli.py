@@ -16,11 +16,14 @@ from datetime import datetime
 import logging
 import os
 from pathlib import Path
+import secrets
 from typing import Optional, Union
 
 import aiofiles
 from fastapi import FastAPI, File, UploadFile, Header
 import uvicorn
+
+from ai.backend.submission.logging import log_config
 
 app = FastAPI()
 log = logging.getLogger(__name__)
@@ -37,7 +40,8 @@ async def create_upload_file(
     file: UploadFile = File(...),
     x_backendai_sender: Optional[str] = Header(None),
 ):
-    log.info("Received submission from %s", x_backendai_sender)
+    run_id = f"submission-{secrets.token_hex(8)}"
+    log.info("run[%s]: Received submission from %s", run_id, x_backendai_sender)
     # You may need a gate here. Only accepting specific sender keys.
     now = datetime.now()
     date_signature = now.strftime("%Y%m%d%H%M%S")
@@ -46,27 +50,53 @@ async def create_upload_file(
 
     # Save and store the file in specific directory.
     async with aiofiles.open(submitted_file_path, "wb") as out_file:
-        while content := await file.read(1024):
-            await out_file.write(content)
+        while chunk := await file.read(1024):
+            await out_file.write(chunk)
 
     # Add your backend.ai CLI command here. This is an example.
-    cmdargs = await get_run_cmd(submitted_file_path)
-    background_process = await asyncio.create_subprocess_exec(*cmdargs)
-    await background_process.wait()
+    log.info("run[%s]: Running a compute session for evaluation...", run_id)
+    session_name = f"eval-{secrets.token_urlsafe(16)}"
+    cmdargs = get_run_cmd(session_name, submitted_file_path)
+    proc = await asyncio.create_subprocess_exec(
+        *cmdargs,
+    )
+    await proc.wait()
+
+    cmdargs = get_log_cmd(session_name)
+    proc = await asyncio.create_subprocess_exec(
+        *cmdargs,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=None,
+    )
+    stdout_bufs = []
+    assert proc.stdout is not None
+    while chunk := await proc.stdout.read(1024):
+        stdout_bufs.append(chunk.decode('utf8'))
+    await proc.wait()
+    stdout = ''.join(stdout_bufs)
+
+    # Check the stdout log.
+    try:
+        check_result(stdout)
+    except AssertionError as e:
+        log.info("run[%s]: Result check failed! (error: %r)", run_id, e)
 
     return {"filename": file.filename}
 
 
-async def get_run_cmd(
+def get_run_cmd(
+    session_name: str,
     submitted_file_path: Path,
 ) -> list[Union[str, Path]]:
     return [
         # The Backend.AI Client SDK CLI.
-        "backend.ai"
+        "backend.ai",
         # run: create session, upload files, and run the given execution command.
         "run",
+        # The session name to use.
+        "-t", session_name,
         # Auto-terminate after execution finishes.
-        "--rm"
+        "--rm",
         # Specify the resource amounts to evalute the submission.
         "-r", "cpu=2",
         "-r", "mem=16G",
@@ -76,8 +106,8 @@ async def get_run_cmd(
         # The install command to install dependencies of the submission.
         # The uploaded path inside container follows the relative path to the current working
         # directory of the client and this submission script.
-        "--build",
-        f"unzip {submitted_file_path} -d .; pip install --user -r ./code/requirements_test.txt",
+        "--build", f"unzip {submitted_file_path} -d .; "
+                   f"pip install --user -r ./requirements_test.txt",
         # The execution command to evalute the submission.
         "--exec", "cd code; python test.py",
         # The image name
@@ -87,7 +117,20 @@ async def get_run_cmd(
     ]
 
 
+def get_log_cmd(session_name: str):
+    return [
+        "backend.ai",
+        "logs",
+        session_name,
+    ]
+
+
+def check_result(stdout: str):
+    assert "Hello Backend.AI!" in stdout
+
+
 def main():
+    logging.config.dictConfig(log_config)
     uvicorn.run(app, log_level="info")
 
 

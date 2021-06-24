@@ -25,7 +25,8 @@ types-pkg-resources = "^0.1.3"
 types-aiofiles = "^0.1.5"
 
 [tool.poetry.scripts]
-evaluator = "ai.backend.submission.evaluator:main"
+evaluator-cli = "ai.backend.submission.evaluator_cli:main"
+evaluator-sdk = "ai.backend.submission.evaluator_sdk:main"
 submit = "ai.backend.submission.submit:main"
 
 [build-system]
