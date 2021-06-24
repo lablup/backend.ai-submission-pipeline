@@ -36,7 +36,7 @@ if 'BACKEND_SECRET_KEY' not in os.environ:
 
 
 @app.post("/submit/")
-async def create_upload_file(
+async def accept_and_evaluate(
     file: UploadFile = File(...),
     x_backendai_sender: Optional[str] = Header(None),
 ):
