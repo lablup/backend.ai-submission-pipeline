@@ -29,15 +29,35 @@ $ poetry install
 ```
 
 
-## Run the submission evaluator sample
+## Run the submission evaluator (based on CLI) sample
+
+This evaluator invokes the `backend.ai` client CLI to execute user codes and get the result logs.
+It downloads the whole container logs after execution, and this includes additional consoloe
+logs of the container in addition to the output of user codes.
 
 ```shell
-$ poetry run evaluator
+$ poetry run evaluator-cli
 ```
 or,
 ```console
 $ poetry shell
-$ python src/ai/backend/submission/evaluator.py
+$ python src/ai/backend/submission/evaluator_cli.py
+```
+
+
+## Run the submission evaluator (based on SDK) sample
+
+This evaluator invkes the client SDK's functional API directly to execute user codes and get the
+result logs.  It is more efficient because it does not have to download the stdout/stderr logs
+twice and the stdout includes only the direct result of the given user code.
+
+```shell
+$ poetry run evaluator-sdk
+```
+or,
+```console
+$ poetry shell
+$ python src/ai/backend/submission/evaluator_sdk.py
 ```
 
 
