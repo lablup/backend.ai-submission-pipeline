@@ -97,11 +97,11 @@ def get_run_cmd(
         "-t", session_name,
         # Auto-terminate after execution finishes.
         "--rm",
-        # Specify the resource amounts to evalute the submission.
+        # FIXME: Specify the resource amounts to evalute the submission.
         "-r", "cpu=2",
         "-r", "mem=16G",
         "-r", "cuda.shares=4",
-        # The project name you belongs to.
+        # FIXME: The project name you belongs to.
         "-g", "lablup",
         # The install command to install dependencies of the submission.
         # The uploaded path inside container follows the relative path to the current working
@@ -110,7 +110,7 @@ def get_run_cmd(
                    f"pip install --user -r ./requirements_test.txt",
         # The execution command to evalute the submission.
         "--exec", "cd code; python test.py",
-        # The image name
+        # FIXME: The image name
         "cr.backend.ai/cloud/python:3.8-ubuntu18.04",
         # The uploaded file(s)
         submitted_file_path,
@@ -131,7 +131,8 @@ def check_result(stdout: str):
 
 def main():
     logging.config.dictConfig(log_config)
-    uvicorn.run(app, log_level="info")
+    # FIXME: put your host and port
+    uvicorn.run(app, host='127.0.0.1', port=8000, log_level="info")
 
 
 if __name__ == "__main__":

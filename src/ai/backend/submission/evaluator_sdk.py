@@ -68,11 +68,19 @@ async def create_upload_file(
     async with AsyncSession() as session:
         log.info("run[%s]: Preparing compute session for evaluation...", run_id)
         compute_session = await session.ComputeSession.get_or_create(
+            # FIXME: The image name
             "cr.backend.ai/cloud/python:3.8-ubuntu18.04",
             name=session_name,
             type_="interactive",
             domain_name="default",
+            # FIXME: The project name you belongs to.
             group_name="lablup",
+            # FIXME: Specify the resource amounts to evalute the submission.
+            resources={
+                'cpu': '2',
+                'mem': '16G',
+                'cuda.shares': '4',
+            },
         )
         if compute_session.status == 'RUNNING':
             if compute_session.created:
@@ -85,28 +93,31 @@ async def create_upload_file(
         elif compute_session.status in ('ERROR', 'CANCELLED'):
             log.error("run[%s]: The session was cancelled or got error during startup.", run_id)
             return reply
-        ret = await compute_session.upload([submitted_file_path], basedir=None)
-        if ret.status // 100 != 2:
-            log.error("run[%s]: Failed to upload the submission file", run_id)
-            return reply
+        try:
+            ret = await compute_session.upload([submitted_file_path], basedir=None)
+            if ret.status // 100 != 2:
+                log.error("run[%s]: Failed to upload the submission file", run_id)
+                return reply
 
-        opts = {
-            'clean': None,
-            'build': f"unzip {submitted_file_path} -d .; "
-                     f"pip install --user -r ./requirements_test.txt",
-            'exec': "cd code; python test.py",
-        }
-        log.info("run[%s]: Executing user code...", run_id)
-        build_exit_code, exec_exit_code, clean_exit_code = await exec_loop(
-            stdout_buf,
-            stderr_buf,
-            compute_session,
-            'batch', '',
-            opts=opts,
-        )
-        log.info("run[%s]: Exit codes of build/exec/clean commands: %d, %d, %d",
-                 run_id, build_exit_code, exec_exit_code, clean_exit_code)
-        # FIXME: You may also check the process exit code of build/exec commands.
+            opts = {
+                'clean': None,
+                'build': f"unzip {submitted_file_path} -d .; "
+                         f"pip install --user -r ./requirements_test.txt",
+                'exec': "cd code; python test.py",
+            }
+            log.info("run[%s]: Executing user code...", run_id)
+            build_exit_code, exec_exit_code, clean_exit_code = await exec_loop(
+                stdout_buf,
+                stderr_buf,
+                compute_session,
+                'batch', '',
+                opts=opts,
+            )
+            log.info("run[%s]: Exit codes of build/exec/clean commands: %d, %d, %d",
+                     run_id, build_exit_code, exec_exit_code, clean_exit_code)
+            # Note: You may also check the process exit code of build/exec commands.
+        finally:
+            await compute_session.destroy()
 
     # Check the stdout log.
     try:
@@ -178,7 +189,8 @@ def check_result(stdout: str):
 
 def main():
     logging.config.dictConfig(log_config)
-    uvicorn.run(app, log_level="info")
+    # FIXME: put your host and port
+    uvicorn.run(app, host='127.0.0.1', port=8000, log_level="info")
 
 
 if __name__ == "__main__":
