@@ -131,3 +131,7 @@ dmypy.json
 # runtime directories and files
 store/*.zip
 submission.zip
+
+# vim
+.swp
+.*.swp
