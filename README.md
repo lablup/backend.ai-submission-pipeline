@@ -72,10 +72,8 @@ This evaluator invokes the client SDK's functional API directly to execute user 
 result logs.  It is more efficient because it does not have to download the stdout/stderr logs
 twice and the stdout includes only the direct result of the given user code.
 
-Requires the evaluator to be running and the user configures his/her identity as
-`BACKENDAI_ACCESS_KEY` environment variable.
-The default evaluator address is set to `http://127.0.0.1:8000` and users should
-change this to match with their clusters.
+Requires the client SDK environment variables to run.
+The default service address is `http://127.0.0.1:8000`.
 
 ```shell
 $ poetry run evaluator-sdk
@@ -88,6 +86,11 @@ $ python src/ai/backend/submission/evaluator_sdk.py
 
 
 ## Run the submission sender sample
+
+Requires the evaluator to be running and the user configures his/her identity as
+`BACKENDAI_ACCESS_KEY` environment variable.
+The default evaluator address is set to `http://127.0.0.1:8000` and users should
+change this to match with their clusters.
 
 ```console
 $ poetry run submit
