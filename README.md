@@ -24,10 +24,10 @@ poetry install
 ```
 
 
-## Run the submission receiver sample
+## Run the submission evaluator sample
 
 ```shell
-poetry run uvicorn --app-dir receiver receiver_demo:app
+poetry run evaluator
 ```
 
 

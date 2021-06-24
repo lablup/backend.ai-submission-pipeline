@@ -17,6 +17,7 @@ from typing import Optional, Union
 
 import aiofiles
 from fastapi import FastAPI, File, UploadFile, Header
+import uvicorn
 
 app = FastAPI()
 log = logging.getLogger(__name__)
@@ -41,7 +42,7 @@ async def create_upload_file(
     submitted_file_path = Path("./store") / submitted_file_name
 
     # Save and store the file in specific directory.
-    async with aiofiles.open(submitted_file_path, 'wb') as out_file:
+    async with aiofiles.open(submitted_file_path, "wb") as out_file:
         while content := await file.read(1024):
             await out_file.write(content)
 
@@ -78,3 +79,7 @@ async def get_run_cmd(
         # The uploaded file(s)
         submitted_file_path,
     ]
+
+
+def main():
+    uvicorn.run(f"{__name__}:app", log_level="info")
