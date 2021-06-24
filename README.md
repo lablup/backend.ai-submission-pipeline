@@ -25,7 +25,7 @@ poetry install
 ## Run the receive server
 
 ```shell
-uvicorn --app-dir receiver receiver_demo:app
+poetry run uvicorn --app-dir receiver receiver_demo:app
 ```
 
 
