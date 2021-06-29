@@ -103,6 +103,9 @@ def get_run_cmd(
         "-r", "cuda.shares=4",
         # FIXME: The project name you belongs to.
         "-g", "lablup",
+        # FIXME: The vfolders to mount and their aliases
+        "-v", "mydata:data",
+        "-v", "mymodel:model",
         # The install command to install dependencies of the submission.
         # The uploaded path inside container follows the relative path to the current working
         # directory of the client and this submission script.
