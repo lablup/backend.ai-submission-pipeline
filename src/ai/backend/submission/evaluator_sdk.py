@@ -81,6 +81,17 @@ async def accept_and_evaluate(
                 'mem': '16G',
                 'cuda.shares': '4',
             },
+            # FIXME: Specify the vfolders to mount.
+            mounts={
+                "mydata",
+                "mymodel",
+            },
+            # FIXME: Specify the aliased folder names inside the container.
+            #        Optional, but all keys must be present in the 'mounts' list.
+            mount_map={
+                "mydata": "data",    # mounted as /home/work/data
+                "mymodel": "model",  # mounted as /home/work/model
+            },
         )
         if compute_session.status == 'RUNNING':
             if compute_session.created:
@@ -99,6 +110,7 @@ async def accept_and_evaluate(
                 log.error("run[%s]: Failed to upload the submission file", run_id)
                 return reply
 
+            # An execution loop may have 3 ordered commands (build, exec, clean).
             opts = {
                 'clean': None,
                 'build': f"unzip {submitted_file_path} -d .; "
@@ -116,6 +128,13 @@ async def accept_and_evaluate(
             log.info("run[%s]: Exit codes of build/exec/clean commands: %d, %d, %d",
                      run_id, build_exit_code, exec_exit_code, clean_exit_code)
             # Note: You may also check the process exit code of build/exec commands.
+            # Download the output file directly.
+            await compute_session.download(["output/result.txt"], ".")
+            # FIXME: check the result
+            async with aiofiles.open("output/result.txt") as f:
+                result = await f.read()
+                assert "Hello world" in result
+            # Note: You may run another exec_loop to execute additional commands.
         finally:
             await compute_session.destroy()
 
